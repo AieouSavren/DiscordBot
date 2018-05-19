@@ -23,6 +23,18 @@ Species[5] = "dragoness";
 Species[6] = "renamon";
 Species[7] = "guilmon";
 
+var HugAdverbs = new Array ();
+HugAdverbs[0] = "firmly";
+HugAdverbs[1] = "tightly";
+HugAdverbs[2] = "noisily";
+HugAdverbs[3] = "merrily";
+HugAdverbs[4] = "quickly";
+HugAdverbs[5] = "eagerly";
+HugAdverbs[6] = "tiredly";
+HugAdverbs[7] = "joyously";
+HugAdverbs[8] = "zealously";
+HugAdverbs[9] = "ferociously";
+
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -107,8 +119,9 @@ client.on("message", async msg => {
 		
 		break;
 		case "hug" : 
-		 var author = msg.author; 
-		msg.author.sendMessage("The Sai bot hugs " +  author + "");
+		  var author = msg.author; 
+		  var i = Math.floor(HugAdverbs.length*Math.random());
+		  msg.channel.send('The Sai bot ' + HugAdverbs[i] + ' hugs ' +  author + '!');
 		break;
 		default:
 		msg.channel.send('The Sai bot meditates attempting to understand your command better.');
