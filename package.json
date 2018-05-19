@@ -1,0 +1,33 @@
+{
+  "name": "node-js-discord",
+  "version": "0.3.0",
+  "description": "A sample Node.js app using Express 4 split routing and discord API",
+  "engines": {
+    "node": "8.9.1",
+    "npm": "5.6.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "discord.js": "~11.2.1",
+    "request": "^2.81.0",
+    "rivescript": "^1.19.0",
+    "twitch-api-v5": "~2.0.2",
+    "upper-case": "~1.0",
+	"tape": "^4.7.0"
+  },
+  "devDependencies": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heroku/node-js-getting-started"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ]
+}
