@@ -1,7 +1,6 @@
 //discord bot
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const BotToken = process.env.BotToken;
 var request = require('request');
 const util = require('util');
 var stream = require('./streamcheck.js');
@@ -43,10 +42,10 @@ client.on('ready', () => {
 client.on("message", async msg => {
 	
 	if(msg.author.bot) return; //no bot to bot chatter
-	if (!msg.content.startsWith(config.prefix)) return;
+	if (!msg.content.startsWith(process.env.PREFIX)) return;
 
   
-  const args = msg.content.slice(config.prefix.length).trim().split(/ +/g);
+  const args = msg.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
   const command = args.shift().toLowerCase();
   
 	switch (command) {
@@ -66,7 +65,7 @@ client.on("message", async msg => {
 		 var author = msg.author; 
 		  var i = Math.floor(InflatabelTypes.length*Math.random())
 		  var i2 = Math.floor(Species.length*Math.random())
-		  console.log(command);
+		  
 		   
 		   //blue guilmon fix.
 		  if(msg.author.tag.toString() == "Cirus Kel#9823" && i2 == 7)
@@ -107,7 +106,7 @@ client.on("message", async msg => {
 		case "twitch" : 
 		if (args.length == 1)
 		  {
-			  stream.checkStream(args[0], config.twitchtoken, function(returncall)
+			  stream.checkStream(args[0], process.env.TWITCH, function(returncall)
 				{
 				msg.reply(util.format("", returncall));
 				});
@@ -149,4 +148,4 @@ client.on('guildMemberRemove', member => {
   channel.send(`${member} has left the server`);
 });
 
-client.login(config.token);
+client.login(process.env.TOKEN);
