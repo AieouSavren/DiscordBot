@@ -5,7 +5,7 @@ const BotToken = process.env.BotToken;
 var request = require('request');
 const util = require('util');
 var stream = require('./streamcheck.js');
-const config = require("./botconfig.json");
+
 
 var InflatabelTypes = new Array ();
 InflatabelTypes[0] = " parade balloon";
@@ -61,7 +61,10 @@ client.on("message", async msg => {
 		  {
 			i2 -= 1;
 		  }
-
+		  if(msg.member.roles.some(r=>["LOVED GOD OF INFLATABLES"].includes(r.name)))
+		  {
+			i2 = 2;
+		  }
 		   
 		  if(!Array.isArray(args) || args.length === 0)
 		  {
