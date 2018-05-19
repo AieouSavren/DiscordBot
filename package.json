@@ -12,15 +12,15 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "discord.js": "~11.2.1",
+    "discord.js": "~11.3.2",
     "request": "^2.81.0",
     "rivescript": "^1.19.0",
     "twitch-api-v5": "~2.0.2",
     "upper-case": "~1.0",
-	"tape": "^4.7.0"
+    "tape": "^4.7.0",
+    "dotenv": "~5.0.1"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/heroku/node-js-getting-started"
