@@ -92,7 +92,7 @@ client.on("message", async msg => {
 		case "twitch" : 
 		if (args.length == 1)
 		  {
-			  stream.checkStream(args[0],'s6ev19m6b0ep7ax0r5o8w097eixg7l', function(returncall)
+			  stream.checkStream(args[0], config.twitchtoken, function(returncall)
 				{
 				msg.reply(util.format("", returncall));
 				});
