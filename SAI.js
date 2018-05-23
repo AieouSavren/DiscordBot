@@ -129,6 +129,10 @@ client.on("message", async msg => {
 		case "squeak" :
 		  msg.channel.send('The Sai bot opens his mouth and emits a mighty **squeak!**');
 		break;
+		case "fwoomp" : 
+		  var author = msg.author; 
+		  msg.channel.send('The Sai bot bops ' +  author + ' with one of his tails, and makes them inflate into a giant balloon!');
+		break;
 		default:
 		msg.channel.send('The Sai bot meditates attempting to understand your command better.');
 		break;
