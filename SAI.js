@@ -122,6 +122,13 @@ client.on("message", async msg => {
 		  var i = Math.floor(HugAdverbs.length*Math.random());
 		  msg.channel.send('The Sai bot ' + HugAdverbs[i] + ' hugs ' +  author + '!');
 		break;
+		case "boop" :
+		  var author = msg.author;
+		  msg.channel.send('The Sai bot gingerly reaches out one of his front paws and touches it to ' + author + '’s nose. “Boop!”');
+		break;
+		case "squeak" :
+		  msg.channel.send('The Sai bot opens his mouth and emits a mighty **squeak!**');
+		break;
 		default:
 		msg.channel.send('The Sai bot meditates attempting to understand your command better.');
 		break;
