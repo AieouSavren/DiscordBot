@@ -1,142 +1,96 @@
 //discord bot
+require('dotenv').config();
+const fs = require('fs');
 const Discord = require('discord.js');
+commands = new Discord.Collection();
+const cooldowns = new Discord.Collection();
+
 const client = new Discord.Client();
-var request = require('request');
+const request = require('request');
 const util = require('util');
-var stream = require('./streamcheck.js');
+
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+
+    // set a new item in the Collection
+    // with the key as the command name and the value as the exported module
+   commands.set(command.name, command);
+}
 
 
-var InflatabelTypes = new Array ();
-InflatabelTypes[0] = " parade balloon";
-InflatabelTypes[1] = " balloonie";
-InflatabelTypes[2] = "";
-InflatabelTypes[3] = " inflatable";
 
-var Species = new Array ();
-Species[0] = "fox";
-Species[1] = "turtle";
-Species[2] = "bunny";
-Species[3] = "skunk";
-Species[4] = "dragon";
-Species[5] = "dragoness";
-Species[6] = "renamon";
-Species[7] = "guilmon";
 
-var HugAdverbs = new Array ();
-HugAdverbs[0] = "firmly";
-HugAdverbs[1] = "tightly";
-HugAdverbs[2] = "noisily";
-HugAdverbs[3] = "merrily";
-HugAdverbs[4] = "quickly";
-HugAdverbs[5] = "eagerly";
-HugAdverbs[6] = "tiredly";
-HugAdverbs[7] = "joyously";
-HugAdverbs[8] = "zealously";
-HugAdverbs[9] = "ferociously";
 
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  client.user.setActivity({game: {name: "meditating", type: 0}});
 });
 
 client.on("message", async msg => {
 	
 	if(msg.author.bot) return; //no bot to bot chatter
 	if (!msg.content.startsWith(process.env.PREFIX)) return;
-
+	
+	/*
+	if(!msg.member.roles.some(r=>["Administrator", "Moderator"].includes(r.name)) )
+      return msg.reply("Sorry, you don't have permissions to use this!");
+  */
   
   const args = msg.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-  const command = args.shift().toLowerCase();
+  const commandName = args.shift().toLowerCase();
   
-	switch (command) {
-		case "ping" :
-		 msg.reply('Pong!');
-		break;
-		case "off" :
-			client.user.setStatus("dnd");
-		break;
-		case "on" :
-			client.user.setStatus("online");
-		break;
-		case "help" :
-			msg.author.sendMessage("Hi Sai Bot. \n Current commands are !ping (returns a pong if the bot is active) \n !tf [type][species](defaults to random from a list. e.g. inflatable)(defaults to random from another list e.g. fox)\n !hug and !help (show's this help pm)");
-		break;
-		case "tf" :
-		 var author = msg.author; 
-		  var i = Math.floor(InflatabelTypes.length*Math.random())
-		  var i2 = Math.floor(Species.length*Math.random())
-		  
-		   
-		   //blue guilmon fix.
-		  if(msg.author.tag.toString() == "Cirus Kel#9823" && i2 == 7)
-		  {
-			i2 -= 1;
-		  }
-		  if(msg.member.roles.some(r=>["LOVED GOD OF INFLATABLES"].includes(r.name)))
-		  {
-			i2 = 2;
-		  }
-		   
-		  if(!Array.isArray(args) || args.length === 0)
-		  {
-			  if(i > 2)
-			  {
-				msg.channel.send('Sai blesses ' + author + ' with an' + InflatabelTypes[i] + ' ' + Species[i2] +  ' ' + 'transformation!');
-
-			  }
-			  else
-			  {
-				msg.channel.send('Sai blesses ' + author + ' with a' + InflatabelTypes[i] + ' ' + Species[i2] +  ' ' + 'transformation!');
-
-			  }
-			  
-			 
-		  }
-		  else if (args.length == 1)
-		  {
-			   msg.channel.send('Sai blesses ' + author + ' with a ' + args[0] + ' ' + Species[i2] +  ' ' + 'transformation!');
-				return;
-		  }
-		  else if(args.length == 2)
-		  {
-			   msg.channel.send('Sai blesses ' + author + ' with a ' + args[0] + ' ' + args[1] +  ' ' + 'transformation!');
-			   return;
-		  }
-		break;
-		case "twitch" : 
-		if (args.length == 1)
-		  {
-			  stream.checkStream(args[0], process.env.TWITCH, function(returncall)
-				{
-				msg.reply(util.format("", returncall));
-				});
-		  }
-		  else
-		  {
-			  msg.reply('Please enter the twitch channel name (as it appears in the url e.g. edmazing ...or someone who actually streams a lot...)');
-		  }
-		
-		break;
-		case "hug" : 
-		  var author = msg.author; 
-		  var i = Math.floor(HugAdverbs.length*Math.random());
-		  msg.channel.send('The Sai bot ' + HugAdverbs[i] + ' hugs ' +  author + '!');
-		break;
-		case "boop" :
-		  var author = msg.author;
-		  msg.channel.send('The Sai bot gingerly reaches out one of his front paws and touches it to ' + author + '’s nose. “Boop!”');
-		break;
-		case "squeak" :
-		  msg.channel.send('The Sai bot opens his mouth and emits a mighty **squeak!**');
-		break;
-		case "fwoomp" : 
-		  var author = msg.author; 
-		  msg.channel.send('The Sai bot bops ' +  author + ' with one of his tails, and makes them inflate into a giant balloon!');
-		break;
-		default:
-		msg.channel.send('The Sai bot meditates attempting to understand your command better.');
-		break;
+	
+	const command = commands.get(commandName) || commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+  
+	//that's not a command name!
+	if (!command) 
+	{
+	msg.channel.send('The Sai bot meditates attempting to understand your command better.');		
+	return;
 	}
+	//does our command have a cool down?
+	if (!cooldowns.has(command.name)) {
+    cooldowns.set(command.name, new Discord.Collection());
+	}
+
+	//what time is it
+	const now = Date.now();
+	const timestamps = cooldowns.get(command.name);
+	
+	//default cooldown is 3s
+	const cooldownAmount = (command.cooldown || 1) * 1000;
+
+	if (!timestamps.has(msg.author.id)) {
+		//okay you're fine to use the command
+		    timestamps.set(msg.author.id, now);
+			setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
+
+	}
+	else {
+		  const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+
+		  //uh-oh you've gotta wait
+		if (now < expirationTime) {
+			const timeLeft = (expirationTime - now) / 1000;
+			return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
+		}
+
+		timestamps.set(msg.author.id, now);
+		setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
+	}
+
+	
+	try {
+		 command.execute(msg, args);
+	}
+	catch (error) {
+		console.error(error);
+		msg.reply('there was an error trying to execute that command!');
+	}
+  
 });
 
 // Create an event listener for new guild members
