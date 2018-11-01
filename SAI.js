@@ -12,11 +12,11 @@ const util = require('util');
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-
-    // set a new item in the Collection
-    // with the key as the command name and the value as the exported module
-   commands.set(command.name, command);
+	const command = require(`./commands/${file}`);
+	
+	// set a new item in the Collection
+	// with the key as the command name and the value as the exported module
+	commands.set(command.name, command);
 }
 
 
@@ -25,8 +25,8 @@ for (const file of commandFiles) {
 
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity({game: {name: "meditating", type: 0}});
+	console.log(`Logged in as ${client.user.tag}!`);
+	client.user.setActivity({game: {name: "meditating", type: 0}});
 });
 
 client.on("message", async msg => {
@@ -36,24 +36,43 @@ client.on("message", async msg => {
 	
 	/*
 	if(!msg.member.roles.some(r=>["Administrator", "Moderator"].includes(r.name)) )
-      return msg.reply("Sorry, you don't have permissions to use this!");
-  */
-  
-  const args = msg.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-  const commandName = args.shift().toLowerCase();
-  
+		return msg.reply("Sorry, you don't have permissions to use this!");
+	*/
+	
+	const args = msg.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
+	const commandName = args.shift().toLowerCase();
+	
 	
 	const command = commands.get(commandName) || commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-  
+	
+	//the command is empty, or consists entirely of the prefix!
+	/*
+		First, set up a regular expression to test for that latter case.
+		It looks confusing... but if the prefix is "!" then our regexp is just /^!!+/.
+		/^!!+/ matches the prefix (only at the beginning of the string!), followed 
+		by the prefix once or more. So '!!hello' is ignored, but '!hello!!' is not.
+	*/
+	const re = new RegExp('^'+process.env.PREFIX+process.env.PREFIX+'+');
+	/*
+		Because the definition of args slices off the first prefix... if it's empty,
+		then our actual command is empty. The regexp is tested on the original message,
+		minus this slicing. If it evaluates to true, then our command has too many
+		prefixes at the beginning, and so we reject that too.
+	*/
+	if (args == "" || re.test(msg.content)) {
+		return; // Don't send a "command not understood" message. Return silently.
+	}
+	
 	//that's not a command name!
 	if (!command) 
 	{
-	msg.channel.send('The Sai bot meditates attempting to understand your command better.');		
-	return;
+		msg.channel.send('The Sai bot meditates in an attempt to understand your command better.');		
+		return;
 	}
+	
 	//does our command have a cool down?
 	if (!cooldowns.has(command.name)) {
-    cooldowns.set(command.name, new Discord.Collection());
+		cooldowns.set(command.name, new Discord.Collection());
 	}
 
 	//what time is it
@@ -65,14 +84,13 @@ client.on("message", async msg => {
 
 	if (!timestamps.has(msg.author.id)) {
 		//okay you're fine to use the command
-		    timestamps.set(msg.author.id, now);
-			setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
-
+		timestamps.set(msg.author.id, now);
+		setTimeout(() => timestamps.delete(msg.author.id), cooldownAmount);
 	}
 	else {
-		  const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
+		const expirationTime = timestamps.get(msg.author.id) + cooldownAmount;
 
-		  //uh-oh you've gotta wait
+		//uh-oh you've gotta wait
 		if (now < expirationTime) {
 			const timeLeft = (expirationTime - now) / 1000;
 			return msg.reply(`please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`);
@@ -90,27 +108,27 @@ client.on("message", async msg => {
 		console.error(error);
 		msg.reply('there was an error trying to execute that command!');
 	}
-  
+	
 });
 
 // Create an event listener for new guild members
 client.on('guildMemberAdd', member => {
-  // Send the message to a designated channel on a server:
-  const channel = member.guild.channels.find('name', 'shrine-artificial-intellegence');
-  // Do nothing if the channel wasn't found on this server
-  if (!channel) return;
-  // Send the message, mentioning the member
-  channel.send(`Welcome to the server, ${member}`);
+	// Send the message to a designated channel on a server:
+	const channel = member.guild.channels.find('name', 'shrine-artificial-intellegence');
+	// Do nothing if the channel wasn't found on this server
+	if (!channel) return;
+	// Send the message, mentioning the member
+	channel.send(`Welcome to the server, ${member}`);
 });
 
 // Create an event listener for leaving guild members
 client.on('guildMemberRemove', member => {
-  // Send the message to a designated channel on a server:
-  const channel = member.guild.channels.find('name', 'shrine-artificial-intellegence');
-  // Do nothing if the channel wasn't found on this server
-  if (!channel) return;
-  // Send the message, mentioning the member
-  channel.send(`${member} has left the server`);
+	// Send the message to a designated channel on a server:
+	const channel = member.guild.channels.find('name', 'shrine-artificial-intellegence');
+	// Do nothing if the channel wasn't found on this server
+	if (!channel) return;
+	// Send the message, mentioning the member
+	channel.send(`${member} has left the server`);
 });
 
 client.login(process.env.TOKEN);
